@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  useStorageVersion();
+  const v = useStorageVersion();
   const [month, setMonth] = useState(currentMonth());
   const employees = storage.listEmployees();
   const active = employees.filter((e) => e.active);
@@ -35,7 +35,7 @@ function Dashboard() {
     }
     return { payable, advances, deductions };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month, employees.length, useStorageVersion()]);
+  }, [month, v]);
 
   return (
     <div className="space-y-6">
