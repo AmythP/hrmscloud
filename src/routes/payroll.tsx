@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ function PayrollRow({ employee, month, onOpenSlip }: { employee: Employee; month
   const [dirty, setDirty] = useState(false);
 
   // Reset on month/employee change
-  useMemo(() => {
+  useEffect(() => {
     setEntry(storage.getPayroll(employee.id, month) ?? emptyEntry(employee.id, month));
     setDirty(false);
   }, [employee.id, month]);
