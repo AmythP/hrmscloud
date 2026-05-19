@@ -96,19 +96,3 @@ export const storage = {
   clear: () => write(defaultDB),
 };
 
-export function useStorageVersion() {
-  // Simple subscribe hook to force re-render on changes
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react") as typeof import("react");
-  const [v, setV] = React.useState(0);
-  React.useEffect(() => {
-    const h = () => setV((x) => x + 1);
-    window.addEventListener("hrms:change", h);
-    window.addEventListener("storage", h);
-    return () => {
-      window.removeEventListener("hrms:change", h);
-      window.removeEventListener("storage", h);
-    };
-  }, []);
-  return v;
-}
