@@ -7,6 +7,8 @@ export type Employee = {
   active: boolean;
 };
 
+export type AttendanceStatus = "P" | "IL" | "UL" | "O";
+
 export type PayrollEntry = {
   employeeId: string;
   month: string; // "YYYY-MM"
@@ -17,6 +19,7 @@ export type PayrollEntry = {
   dressPenalty: number;
   eatingDues: number;
   notes: string;
+  attendance?: Record<number, AttendanceStatus>; // day (1-31) -> status
 };
 
 export type Settings = {

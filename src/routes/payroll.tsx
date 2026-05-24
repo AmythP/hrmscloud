@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText } from "lucide-react";
+import { FileText, CalendarCheck } from "lucide-react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -14,6 +14,7 @@ import { computePayroll, currentMonth, formatCurrency, monthLabel } from "@/lib/
 import { MonthPicker } from "@/components/month-picker";
 import type { PayrollEntry, Employee } from "@/lib/types";
 import { SalarySlip } from "@/components/salary-slip";
+import { AttendanceDialog } from "@/components/attendance-dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/payroll")({
@@ -74,11 +75,13 @@ function PayrollPage() {
 }
 
 function PayrollRow({ employee, month, onOpenSlip }: { employee: Employee; month: string; onOpenSlip: () => void }) {
+  useStorageVersion();
   const saved = storage.getPayroll(employee.id, month);
   const [entry, setEntry] = useState<PayrollEntry>(saved ?? emptyEntry(employee.id, month));
   const [dirty, setDirty] = useState(false);
+  const [attendanceOpen, setAttendanceOpen] = useState(false);
 
-  // Reset on month/employee change
+  // Reset on month/employee/storage change
   useEffect(() => {
     setEntry(storage.getPayroll(employee.id, month) ?? emptyEntry(employee.id, month));
     setDirty(false);
@@ -130,10 +133,29 @@ function PayrollRow({ employee, month, onOpenSlip }: { employee: Employee; month
           {c.uninformedLeaveDeduction > 0 && <span>−{formatCurrency(c.uninformedLeaveDeduction)} uninformed</span>}
         </div>
         <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="outline" onClick={() => setAttendanceOpen(true)}>
+            <CalendarCheck className="h-4 w-4" /> Attendance
+          </Button>
           <Button variant="outline" onClick={onOpenSlip}><FileText className="h-4 w-4" /> Salary slip</Button>
           <Button onClick={save} disabled={!dirty}>{dirty ? "Save changes" : "Saved"}</Button>
         </div>
       </CardContent>
+      <AttendanceDialog
+        open={attendanceOpen}
+        onOpenChange={(o) => {
+          setAttendanceOpen(o);
+          if (!o) {
+            // refresh entry to reflect any updated leave counts from attendance
+            const fresh = storage.getPayroll(employee.id, month);
+            if (fresh) {
+              setEntry(fresh);
+              setDirty(false);
+            }
+          }
+        }}
+        employee={employee}
+        month={month}
+      />
     </Card>
   );
 }
