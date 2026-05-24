@@ -75,11 +75,13 @@ function PayrollPage() {
 }
 
 function PayrollRow({ employee, month, onOpenSlip }: { employee: Employee; month: string; onOpenSlip: () => void }) {
+  useStorageVersion();
   const saved = storage.getPayroll(employee.id, month);
   const [entry, setEntry] = useState<PayrollEntry>(saved ?? emptyEntry(employee.id, month));
   const [dirty, setDirty] = useState(false);
+  const [attendanceOpen, setAttendanceOpen] = useState(false);
 
-  // Reset on month/employee change
+  // Reset on month/employee/storage change
   useEffect(() => {
     setEntry(storage.getPayroll(employee.id, month) ?? emptyEntry(employee.id, month));
     setDirty(false);
