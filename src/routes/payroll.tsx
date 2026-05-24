@@ -133,10 +133,29 @@ function PayrollRow({ employee, month, onOpenSlip }: { employee: Employee; month
           {c.uninformedLeaveDeduction > 0 && <span>−{formatCurrency(c.uninformedLeaveDeduction)} uninformed</span>}
         </div>
         <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="outline" onClick={() => setAttendanceOpen(true)}>
+            <CalendarCheck className="h-4 w-4" /> Attendance
+          </Button>
           <Button variant="outline" onClick={onOpenSlip}><FileText className="h-4 w-4" /> Salary slip</Button>
           <Button onClick={save} disabled={!dirty}>{dirty ? "Save changes" : "Saved"}</Button>
         </div>
       </CardContent>
+      <AttendanceDialog
+        open={attendanceOpen}
+        onOpenChange={(o) => {
+          setAttendanceOpen(o);
+          if (!o) {
+            // refresh entry to reflect any updated leave counts from attendance
+            const fresh = storage.getPayroll(employee.id, month);
+            if (fresh) {
+              setEntry(fresh);
+              setDirty(false);
+            }
+          }
+        }}
+        employee={employee}
+        month={month}
+      />
     </Card>
   );
 }
